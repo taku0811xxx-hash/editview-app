@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'Editview <onboarding@resend.dev>',
+      from: 'Editview <noreply@editview.app>',
       to: [editorEmail],
       subject,
       html,
