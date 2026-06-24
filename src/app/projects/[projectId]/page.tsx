@@ -146,7 +146,7 @@ export default function ProjectDetailPage() {
   const unsentComments = topLevelComments.filter(c => c.role === 'client' && c.revisionRound === null)
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       <AppHeader />
       <div className="flex-1 flex items-center justify-center">
         <p className="text-gray-400 text-sm">読み込み中...</p>
@@ -155,7 +155,7 @@ export default function ProjectDetailPage() {
   )
 
   if (!project) return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       <AppHeader />
       <div className="flex-1 flex items-center justify-center">
         <p className="text-gray-400 text-sm">案件が見つかりません</p>
@@ -164,7 +164,7 @@ export default function ProjectDetailPage() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       <AppHeader />
 
       {/* サブヘッダー */}
