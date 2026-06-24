@@ -140,6 +140,10 @@ export default function ProjectDetailPage() {
   const topLevelComments = comments.filter(c => !c.parentId)
   const getReplies = (commentId: string) => comments.filter(c => c.parentId === commentId)
   const unresolvedCount = topLevelComments.filter(c => !c.resolved).length
+  const sentRounds = Array.from(
+    new Set(topLevelComments.filter(c => c.revisionRound !== null).map(c => c.revisionRound!))
+  ).sort((a, b) => a - b)
+  const unsentComments = topLevelComments.filter(c => c.role === 'client' && c.revisionRound === null)
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -284,11 +288,21 @@ export default function ProjectDetailPage() {
                 <p className="text-xs text-gray-300">コメントはまだありません</p>
               </div>
             )}
-            {topLevelComments.map(comment => {
-              const replies = getReplies(comment.id)
-              const isActive = comment.id === activeCommentId
+
+            {sentRounds.map(round => {
+              const roundComments = topLevelComments.filter(c => c.revisionRound === round)
               return (
-                <div key={comment.id} ref={el => { commentRefs.current[comment.id] = el }}>
+                <div key={round} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">第{round}回修正</span>
+                    <div className="flex-1 border-t border-gray-100" />
+                    <span className="text-xs text-gray-300">{roundComments.length}件</span>
+                  </div>
+                  {roundComments.map(comment => {
+                    const replies = getReplies(comment.id)
+                    const isActive = comment.id === activeCommentId
+                    return (
+                      <div key={comment.id} ref={el => { commentRefs.current[comment.id] = el }}>
                   <div className={`rounded-xl p-3 transition-all duration-200 border ${
                     isActive
                       ? 'border-purple-300 bg-purple-50/60'
@@ -362,8 +376,58 @@ export default function ProjectDetailPage() {
                     </div>
                   )}
                 </div>
+                    )
+                  })}
+                </div>
               )
             })}
+
+            {unsentComments.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">未送信</span>
+                  <div className="flex-1 border-t border-gray-100" />
+                  <span className="text-xs text-gray-300">{unsentComments.length}件</span>
+                </div>
+                {unsentComments.map(comment => {
+                  const replies = getReplies(comment.id)
+                  const isActive = comment.id === activeCommentId
+                  return (
+                    <div key={comment.id} ref={el => { commentRefs.current[comment.id] = el }}>
+                      <div className={`rounded-xl p-3 transition-all duration-200 border ${isActive ? 'border-purple-300 bg-purple-50/60' : comment.resolved ? 'border-gray-100 bg-gray-50/50 opacity-50' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <button onClick={() => { videoRef.current && (videoRef.current.currentTime = comment.timecode) }} className={`font-mono text-xs rounded-md px-2 py-0.5 transition-colors ${isActive ? 'bg-purple-500 text-white' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}>{formatTimecode(comment.timecode)}</button>
+                          <span className="text-xs text-gray-400 flex-1 truncate">{comment.authorName}</span>
+                          {isActive && <span className="text-xs bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full">再生中</span>}
+                          {comment.resolved && !isActive && <span className="text-xs bg-teal-50 text-teal-600 px-1.5 py-0.5 rounded-full">完了</span>}
+                        </div>
+                        <p className={`text-xs leading-relaxed mb-2 ${isActive ? 'text-gray-900 font-medium' : 'text-gray-700'}`}>{comment.text}</p>
+                        <div className="flex gap-1.5">
+                          <button onClick={() => handleToggleResolve(comment)} className={`text-xs px-2.5 py-1 rounded-md border font-medium transition-colors ${comment.resolved ? 'border-orange-200 text-orange-500 hover:bg-orange-50' : 'border-green-200 text-green-600 hover:bg-green-50'}`}>{comment.resolved ? '未完に戻す' : '完了にする'}</button>
+                          <button onClick={() => setReplyOpen(prev => ({ ...prev, [comment.id]: !prev[comment.id] }))} className="text-xs px-2.5 py-1 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors">返信</button>
+                        </div>
+                        {replyOpen[comment.id] && (
+                          <div className="mt-2 flex gap-1.5">
+                            <input value={replyText[comment.id] ?? ''} onChange={e => setReplyText(prev => ({ ...prev, [comment.id]: e.target.value }))} placeholder="返信を入力..." className="flex-1 text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-gray-400" onKeyDown={e => { if (e.key === 'Enter') handleReply(comment) }} />
+                            <button onClick={() => handleReply(comment)} className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 hover:bg-gray-50 transition-colors">送信</button>
+                          </div>
+                        )}
+                      </div>
+                      {replies.length > 0 && (
+                        <div className="ml-4 mt-1.5 space-y-1.5 border-l-2 border-gray-100 pl-3">
+                          {replies.map(reply => (
+                            <div key={reply.id} className="rounded-lg p-2.5 bg-gray-50 border border-gray-100">
+                              <span className={`text-xs font-medium ${reply.role === 'editor' ? 'text-blue-500' : 'text-gray-400'}`}>{reply.authorName}{reply.role === 'editor' ? '（編集者）' : ''}</span>
+                              <p className="text-xs text-gray-600 leading-relaxed mt-0.5">{reply.text}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           {/* 共有情報フッター */}
