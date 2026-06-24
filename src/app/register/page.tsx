@@ -111,7 +111,7 @@ export default function RegisterPage() {
               type="text"
               value={displayName}
               onChange={e => setDisplayName(e.target.value)}
-              placeholder="例: たく（PROTO）"
+              placeholder="例: 編集者名を入力"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-400"
               required
             />

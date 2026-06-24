@@ -83,7 +83,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <label className="block text-xs text-gray-500 mb-1.5">表示名</label>
-                <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="例: たく（PROTO）" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-400" />
+                <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="例: 編集者名を入力" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-gray-400" />
                 <p className="text-xs text-gray-400 mt-1.5">コメント返信時に表示される名前です</p>
               </div>
               <button type="submit" disabled={saving} className="bg-gray-900 text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-700 disabled:opacity-50">
