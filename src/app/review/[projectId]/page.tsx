@@ -161,9 +161,12 @@ export default function ReviewPage() {
       const updated = await getProject(projectId)
       if (updated) {
         setProject(updated)
+        console.log('editorId:', updated.editorId)
         const editorEmail = await getEditorEmail(updated.editorId)
+        console.log('editorEmail:', editorEmail)
         if (editorEmail) {
           await sendRevisionNotification(projectId, updated.title, updated.clientName, editorEmail)
+          console.log('revision notification sent')
         }
       }
       await loadData()
@@ -179,9 +182,12 @@ export default function ReviewPage() {
       await approveProject(projectId)
       const p = await getProject(projectId)
       if (p) {
+        console.log('editorId:', p.editorId)
         const editorEmail = await getEditorEmail(p.editorId)
+        console.log('editorEmail:', editorEmail)
         if (editorEmail) {
           await sendApprovalNotification(projectId, p.title, p.clientName, editorEmail)
+          console.log('approval notification sent')
         }
       }
       sessionStorage.removeItem(SESSION_KEY(projectId))
