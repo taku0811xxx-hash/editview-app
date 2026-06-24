@@ -269,7 +269,7 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* 右：コメントサイドバー */}
-        <div className="w-96 bg-white flex flex-col">
+        <div className="w-96 bg-white flex flex-col overflow-hidden">
           {/* コメントヘッダー */}
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -282,7 +282,7 @@ export default function ProjectDetailPage() {
           </div>
 
           {/* コメントリスト */}
-          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-2.5">
+          <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4" style={{ minHeight: 0 }}>
             {topLevelComments.length === 0 && (
               <div className="flex items-center justify-center h-20">
                 <p className="text-xs text-gray-300">コメントはまだありません</p>
