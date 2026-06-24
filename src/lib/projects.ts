@@ -92,3 +92,10 @@ export const verifyProjectPassword = async (projectId: string, password: string)
   if (!project) return false
   return project.password === password
 }
+
+export const getEditorEmail = async (editorId: string): Promise<string | null> => {
+  const { getDoc, doc } = await import('firebase/firestore')
+  const snap = await getDoc(doc(db, 'editors', editorId))
+  if (!snap.exists()) return null
+  return snap.data().email ?? null
+}

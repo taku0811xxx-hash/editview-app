@@ -2,7 +2,8 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import { getProject, approveProject, sendRevision } from '@/lib/projects'
+import { getProject, approveProject, sendRevision, getEditorEmail } from '@/lib/projects'
+import { sendRevisionNotification, sendApprovalNotification } from '@/lib/notify'
 import { getVersions } from '@/lib/versions'
 import { getComments, addComment, markCommentsAsSent, formatTimecode } from '@/lib/comments'
 import { Project, Version, Comment } from '@/types'
@@ -158,7 +159,13 @@ export default function ReviewPage() {
       await markCommentsAsSent(projectId, nextCount)
       await sendRevision(projectId, nextCount)
       const updated = await getProject(projectId)
-      if (updated) setProject(updated)
+      if (updated) {
+        setProject(updated)
+        const editorEmail = await getEditorEmail(updated.editorId)
+        if (editorEmail) {
+          await sendRevisionNotification(projectId, updated.title, updated.clientName, editorEmail)
+        }
+      }
       await loadData()
     } finally {
       setSendingRevision(false)
@@ -170,6 +177,13 @@ export default function ReviewPage() {
     setApproving(true)
     try {
       await approveProject(projectId)
+      const p = await getProject(projectId)
+      if (p) {
+        const editorEmail = await getEditorEmail(p.editorId)
+        if (editorEmail) {
+          await sendApprovalNotification(projectId, p.title, p.clientName, editorEmail)
+        }
+      }
       sessionStorage.removeItem(SESSION_KEY(projectId))
       setPhase('thankyou')
     } finally {
