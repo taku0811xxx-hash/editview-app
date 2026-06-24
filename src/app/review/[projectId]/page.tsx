@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import { getProject, approveProject, sendRevision, getEditorEmail } from '@/lib/projects'
+import { getProject, approveProject, sendRevision } from '@/lib/projects'
 import { sendRevisionNotification, sendApprovalNotification } from '@/lib/notify'
 import { getVersions } from '@/lib/versions'
 import { getComments, addComment, markCommentsAsSent, formatTimecode } from '@/lib/comments'
@@ -161,12 +161,8 @@ export default function ReviewPage() {
       const updated = await getProject(projectId)
       if (updated) {
         setProject(updated)
-        console.log('editorId:', updated.editorId)
-        const editorEmail = await getEditorEmail(updated.editorId)
-        console.log('editorEmail:', editorEmail)
-        if (editorEmail) {
-          await sendRevisionNotification(projectId, updated.title, updated.clientName, editorEmail)
-          console.log('revision notification sent')
+        if (updated.editorEmail) {
+          await sendRevisionNotification(projectId, updated.title, updated.clientName, updated.editorEmail)
         }
       }
       await loadData()
@@ -180,15 +176,8 @@ export default function ReviewPage() {
     setApproving(true)
     try {
       await approveProject(projectId)
-      const p = await getProject(projectId)
-      if (p) {
-        console.log('editorId:', p.editorId)
-        const editorEmail = await getEditorEmail(p.editorId)
-        console.log('editorEmail:', editorEmail)
-        if (editorEmail) {
-          await sendApprovalNotification(projectId, p.title, p.clientName, editorEmail)
-          console.log('approval notification sent')
-        }
+      if (project?.editorEmail) {
+        await sendApprovalNotification(projectId, project.title, project.clientName, project.editorEmail)
       }
       sessionStorage.removeItem(SESSION_KEY(projectId))
       setPhase('thankyou')

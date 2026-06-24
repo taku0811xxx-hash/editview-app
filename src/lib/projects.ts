@@ -13,6 +13,7 @@ const generatePassword = () => {
 
 export const createProject = async (
   editorId: string,
+  editorEmail: string,
   title: string,
   clientName: string,
   revisionLimit: number = 3,
@@ -21,6 +22,7 @@ export const createProject = async (
   const ref = await addDoc(collection(db, 'projects'), {
     title,
     editorId,
+    editorEmail,
     clientName,
     status: 'draft',
     password,

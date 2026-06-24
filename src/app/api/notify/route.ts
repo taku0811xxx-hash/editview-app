@@ -7,7 +7,11 @@ export async function POST(req: NextRequest) {
   try {
     const { type, projectTitle, clientName, editorEmail, projectId } = await req.json()
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://editview-app.vercel.app'
+    if (!editorEmail) {
+      return NextResponse.json({ error: 'editorEmail is required' }, { status: 400 })
+    }
+
+    const baseUrl = 'https://editview-app.vercel.app'
     const projectUrl = `${baseUrl}/projects/${projectId}`
 
     let subject = ''
@@ -65,7 +69,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ data })
   } catch (e) {
-    console.error(e)
+    console.error('Notify error:', e)
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 }

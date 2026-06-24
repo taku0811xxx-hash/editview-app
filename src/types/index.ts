@@ -5,6 +5,7 @@ export interface Project {
   id: string
   title: string
   editorId: string
+  editorEmail: string
   clientName: string
   status: ProjectStatus
   password: string

@@ -13,12 +13,14 @@ export default function NewProjectPage() {
   const [revisionLimit, setRevisionLimit] = useState(3)
   const [loading, setLoading] = useState(false)
   const [editorId, setEditorId] = useState<string | null>(null)
+  const [editorEmail, setEditorEmail] = useState<string>('')
   const router = useRouter()
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (!user) { router.push('/login'); return }
       setEditorId(user.uid)
+      setEditorEmail(user.email ?? '')
     })
     return () => unsub()
   }, [router])
@@ -28,7 +30,7 @@ export default function NewProjectPage() {
     if (!editorId) return
     setLoading(true)
     try {
-      const { id } = await createProject(editorId, title, clientName, revisionLimit)
+      const { id } = await createProject(editorId, editorEmail, title, clientName, revisionLimit)
       router.push(`/projects/${id}`)
     } catch (e) {
       console.error(e)
