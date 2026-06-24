@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -17,7 +18,11 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      const { user } = await signInWithEmailAndPassword(auth, email, password)
+      if (!user.emailVerified) {
+        setError('メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。')
+        return
+      }
       router.push('/dashboard')
     } catch {
       setError('メールアドレスまたはパスワードが正しくありません')
@@ -61,6 +66,10 @@ export default function LoginPage() {
             {loading ? 'ログイン中...' : 'ログイン'}
           </button>
         </form>
+        <p className="text-xs text-center text-gray-400 mt-5">
+          アカウントをお持ちでない方は
+          <Link href="/register" className="text-gray-700 underline underline-offset-2 ml-1">新規登録</Link>
+        </p>
       </div>
     </div>
   )
