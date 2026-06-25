@@ -74,6 +74,35 @@ export default function ProjectDetailPage() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !project) return
+
+    // 案内アラート
+    const confirmed = window.confirm(
+      '【アップロードの注意事項】\n\n' +
+      '・確認用動画（720p推奨）をアップロードしてください\n' +
+      '・ファイルサイズの上限は5GBです\n' +
+      '・新しいバージョンをアップロードすると旧バージョンの動画は削除されます\n\n' +
+      'このままアップロードしますか？'
+    )
+    if (!confirmed) {
+      e.target.value = ''
+      return
+    }
+
+    // ① ファイルサイズチェック（5GB上限）
+    const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024
+    if (file.size > MAX_FILE_SIZE) {
+      setUploadError('ファイルサイズが5GBを超えています。確認用動画（720p推奨）をアップロードしてください。')
+      return
+    }
+
+    // ② 1日あたりのアップロード回数チェック（10回/日）
+    const uploadCountKey = `upload_count_${projectId}_${new Date().toDateString()}`
+    const currentCount = parseInt(localStorage.getItem(uploadCountKey) ?? '0')
+    if (currentCount >= 10) {
+      setUploadError('1日のアップロード上限（10回）に達しました。翌日以降にお試しください。')
+      return
+    }
+
     setUploading(true)
     setUploadProgress(0)
     setUploadError(null)
@@ -109,6 +138,10 @@ export default function ProjectDetailPage() {
       const versionNumber = versions.length + 1
       const label = versionNumber === 1 ? '初稿' : `修正版${versionNumber - 1}`
       await addVersion(projectId, videoUrl, key, label, versionNumber)
+      // アップロード回数カウントを増やす
+      const countKey = `upload_count_${projectId}_${new Date().toDateString()}`
+      const count = parseInt(localStorage.getItem(countKey) ?? '0')
+      localStorage.setItem(countKey, String(count + 1))
       await loadData()
     } catch (err) {
       console.error(err)
