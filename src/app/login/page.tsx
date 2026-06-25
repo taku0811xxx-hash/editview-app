@@ -32,7 +32,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm">
         <h1 className="text-xl font-medium text-gray-900 mb-2">ログイン</h1>
         <p className="text-sm text-gray-500 mb-6">動画レビューツール — 編集者用</p>

@@ -79,3 +79,8 @@ export const formatTimecode = (seconds: number) => {
   const s = Math.floor(seconds % 60)
   return `${m}:${s.toString().padStart(2, '0')}`
 }
+
+export const deleteComment = async (projectId: string, commentId: string) => {
+  const { deleteDoc, doc } = await import('firebase/firestore')
+  await deleteDoc(doc(db, 'projects', projectId, 'comments', commentId))
+}

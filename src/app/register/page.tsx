@@ -61,7 +61,7 @@ export default function RegisterPage() {
 
   if (phase === 'verify') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm text-center">
           <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-blue-600 text-xl">✉</span>
@@ -83,7 +83,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm">
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
@@ -151,7 +151,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gray-900 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            className="w-full bg-gray-950 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-gray-800 disabled:opacity-50 transition-colors"
           >
             {loading ? '登録中...' : 'アカウントを作成する'}
           </button>
