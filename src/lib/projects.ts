@@ -74,7 +74,7 @@ export const updateProjectStatus = async (projectId: string, status: Project['st
 
 export const approveProject = async (projectId: string) => {
   const deleteVideoAt = new Date()
-  deleteVideoAt.setDate(deleteVideoAt.getDate() + 30)
+  deleteVideoAt.setDate(deleteVideoAt.getDate() + 14)
   await updateDoc(doc(db, 'projects', projectId), {
     status: 'approved',
     approvedAt: serverTimestamp(),

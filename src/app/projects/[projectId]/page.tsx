@@ -24,6 +24,7 @@ export default function ProjectDetailPage() {
   
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const [replyText, setReplyText] = useState<Record<string, string>>({})
   const [replyOpen, setReplyOpen] = useState<Record<string, boolean>>({})
   const [copied, setCopied] = useState<'url' | 'pass' | null>(null)
@@ -75,6 +76,7 @@ export default function ProjectDetailPage() {
     if (!file || !project) return
     setUploading(true)
     setUploadProgress(0)
+    setUploadError(null)
     try {
       const key = `videos/${projectId}/${Date.now()}_${file.name}`
       const res = await fetch('/api/upload', {
@@ -82,6 +84,15 @@ export default function ProjectDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key, contentType: file.type }),
       })
+      if (!res.ok) {
+        const data = await res.json()
+        if (data.error === 'storage_limit_exceeded') {
+          setUploadError('現在ストレージ容量の上限に達しているため、アップロードできません。')
+        } else {
+          setUploadError('アップロードに失敗しました。')
+        }
+        return
+      }
       const { url } = await res.json()
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest()
@@ -352,6 +363,12 @@ export default function ProjectDetailPage() {
       {uploading && uploadProgress > 0 && (
         <div className="h-0.5 bg-gray-100">
           <div className="h-full bg-gray-900 transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+        </div>
+      )}
+      {uploadError && (
+        <div className="bg-red-50 border-b border-red-200 px-6 py-2 flex items-center justify-between">
+          <p className="text-xs text-red-600">{uploadError}</p>
+          <button onClick={() => setUploadError(null)} className="text-xs text-red-400 hover:text-red-600">✕</button>
         </div>
       )}
 

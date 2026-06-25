@@ -5,6 +5,19 @@ import {
 import { db } from './firebase'
 import { Version } from '@/types'
 
+// 古い動画をR2から削除
+const deleteOldVideo = async (r2Key: string) => {
+  try {
+    await fetch('/api/delete-video', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ r2Key }),
+    })
+  } catch (e) {
+    console.error('旧動画削除エラー:', e)
+  }
+}
+
 export const addVersion = async (
   projectId: string,
   videoUrl: string,
@@ -12,6 +25,17 @@ export const addVersion = async (
   label: string,
   versionNumber: number,
 ) => {
+  // 既存バージョンを取得して古い動画を削除
+  if (versionNumber > 1) {
+    const existing = await getVersions(projectId)
+    for (const v of existing) {
+      if (v.r2Key) {
+        await deleteOldVideo(v.r2Key)
+        console.log(`旧バージョン削除: ${v.r2Key}`)
+      }
+    }
+  }
+
   const ref = await addDoc(collection(db, 'projects', projectId, 'versions'), {
     versionNumber,
     label,
