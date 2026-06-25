@@ -79,7 +79,7 @@ export default function ProjectDetailPage() {
     const confirmed = window.confirm(
       '【アップロードの注意事項】\n\n' +
       '・確認用動画（720p推奨）をアップロードしてください\n' +
-      '・ファイルサイズの上限は5GBです\n' +
+      '・ファイルサイズの上限は3GBです\n' +
       '・新しいバージョンをアップロードすると旧バージョンの動画は削除されます\n\n' +
       'このままアップロードしますか？'
     )
@@ -89,9 +89,9 @@ export default function ProjectDetailPage() {
     }
 
     // ① ファイルサイズチェック（5GB上限）
-    const MAX_FILE_SIZE = 5 * 1024 * 1024 * 1024
+    const MAX_FILE_SIZE = 3 * 1024 * 1024 * 1024
     if (file.size > MAX_FILE_SIZE) {
-      setUploadError('ファイルサイズが5GBを超えています。確認用動画（720p推奨）をアップロードしてください。')
+      setUploadError('ファイルサイズが3GBを超えています。確認用動画（720p推奨）をアップロードしてください。')
       return
     }
 
